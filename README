@@ -1,0 +1,10 @@
+SIMCMakeMacros
+===========
+
+A small diversity of FindFoo packages and misc other utilities for CMake. 
+
+For info about cmake, browse around https://www.cmake.org/
+
+Directory structure follows that of the CMake install directories. In addition,
+there is a Tests-directory that contains tests for the implementation different
+functions. The tests also serve as usage examples.
