@@ -35,17 +35,17 @@ MACRO(SIM_HAS_ARGUMENT hasargument keyword)
     LIST(GET Args ${Index} Element)
 
     # Spool to the argument we are looking for
-    WHILE(NOT ${Index} GREATER ${Count} AND NOT ${Element} STREQUAL ${keyword})
+    WHILE(NOT ${Index} GREATER ${Count} AND NOT Element STREQUAL "${keyword}")
       MATH(EXPR Index "${Index} + 1")
       IF(NOT ${Index} GREATER ${Count})
         LIST(GET Args ${Index} Element)
       ENDIF(NOT ${Index} GREATER ${Count})
-    ENDWHILE(NOT ${Index} GREATER ${Count} AND NOT ${Element} STREQUAL ${keyword})
+    ENDWHILE(NOT ${Index} GREATER ${Count} AND NOT Element STREQUAL "${keyword}")
 
     # Check if the element was found
-    IF(${Element} STREQUAL ${keyword})
+    IF(Element STREQUAL "${keyword}")
       SET(${hasargument} TRUE)
-    ENDIF(${Element} STREQUAL ${keyword})
+    ENDIF(Element STREQUAL "${keyword}")
   ENDIF(${Count} GREATER 0)
 ENDMACRO(SIM_HAS_ARGUMENT)
 
@@ -76,12 +76,12 @@ MACRO(SIM_FETCH_ARGUMENTS result keyword)
     LIST(GET Args ${Index} Element)
 
     # 1. Spool to the argument we are looking for
-    WHILE(NOT ${Index} GREATER ${Count} AND NOT ${Element} STREQUAL ${keyword})
+    WHILE(NOT ${Index} GREATER ${Count} AND NOT "${Element}" STREQUAL "${keyword}")
       MATH(EXPR Index "${Index} + 1")
       IF(NOT ${Index} GREATER ${Count})
         LIST(GET Args ${Index} Element)
       ENDIF(NOT ${Index} GREATER ${Count})
-    ENDWHILE(NOT ${Index} GREATER ${Count} AND NOT ${Element} STREQUAL ${keyword})
+    ENDWHILE(NOT ${Index} GREATER ${Count} AND NOT "${Element}" STREQUAL "${keyword}")
 
     # 2. Iterate through list
     SET(ResultList )
@@ -90,7 +90,7 @@ MACRO(SIM_FETCH_ARGUMENTS result keyword)
       LIST(GET Args ${Index} Element)
       STRING(TOUPPER ${Element} UpperElement)
     ENDIF(NOT ${Index} GREATER ${Count})
-    WHILE(NOT ${Element} STREQUAL ${UpperElement} AND NOT ${Index} GREATER ${Count})
+    WHILE(NOT "${Element}" STREQUAL "${UpperElement}" AND NOT ${Index} GREATER ${Count})
       LIST(APPEND ResultList ${Element})
       # Get the next element
       MATH(EXPR Index "${Index} + 1")
@@ -98,7 +98,7 @@ MACRO(SIM_FETCH_ARGUMENTS result keyword)
         LIST(GET Args ${Index} Element)
         STRING(TOUPPER ${Element} UpperElement)
       ENDIF(NOT ${Index} GREATER ${Count})
-    ENDWHILE(NOT ${Element} STREQUAL ${UpperElement} AND NOT ${Index} GREATER ${Count})
+    ENDWHILE(NOT "${Element}" STREQUAL "${UpperElement}" AND NOT ${Index} GREATER ${Count})
 
     # Return
     SET(${result} ${ResultList})
@@ -122,9 +122,9 @@ MACRO(SIM_VALIDATE_ARGUMENTS success method required allowed args)
     SET(Found FALSE)
     FOREACH(argv ${args})
       # Check if argument matches requirement
-      IF(${argv} STREQUAL ${req})
+      IF(argv STREQUAL "${req}")
         SET(Found TRUE)
-      ENDIF(${argv} STREQUAL ${req})
+      ENDIF(argv STREQUAL "${req}")
     ENDFOREACH(argv)
 
     IF(Found)
@@ -139,9 +139,9 @@ MACRO(SIM_VALIDATE_ARGUMENTS success method required allowed args)
   FOREACH(argv ${args})
     # Add to found arguments if ${argv} is all uppercase
     STRING(TOUPPER ${argv} Upper)
-    IF(${Upper} STREQUAL ${argv})
+    IF(Upper STREQUAL "${argv}")
       LIST(APPEND Arguments ${argv})
-    ENDIF(${Upper} STREQUAL ${argv})
+    ENDIF(Upper STREQUAL "${argv}")
   ENDFOREACH(argv)
 
   # Check if all the found arguments is allowed
@@ -149,9 +149,9 @@ MACRO(SIM_VALIDATE_ARGUMENTS success method required allowed args)
     SET(Found FALSE)
     FOREACH(allowedarg ${allowed})
       # Check if argument matches the allowed entry
-      IF(${allowedarg} STREQUAL ${argv})
+      IF(allowedarg STREQUAL "${argv}")
         SET(Found TRUE)
-      ENDIF(${allowedarg} STREQUAL ${argv})
+      ENDIF(allowedarg STREQUAL "${argv}")
     ENDFOREACH(allowedarg)
 
     IF(Found)
