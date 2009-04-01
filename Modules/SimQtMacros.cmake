@@ -170,3 +170,12 @@ MACRO(SIM_CREATE_QT_PLUGIN)
     ENDIF(HasSource)
   ENDIF(ValidArguments)
 ENDMACRO(SIM_CREATE_QT_PLUGIN)
+
+# Stores the path to Qt in the argument given. Uses
+# QT_MOC_EXECUTABLE to extract the path.
+# 
+# SIM_GET_QT_ROOT(variable)
+MACRO(SIM_GET_QT_ROOT variable)
+  GET_FILENAME_COMPONENT(${variable} ${QT_MOC_EXECUTABLE} PATH)
+  FILE(TO_CMAKE_PATH "${${variable}}/../" ${variable}) 
+ENDMACRO(SIM_GET_QT_RO
