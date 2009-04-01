@@ -1,8 +1,0 @@
-# This code sets the following variables:
-# <LIBRARY>_FOUND
-# <LIBRARY>_INCLUDE_DIR
-# <LIBRARY>_LIBRARY
-
-INCLUDE(SimFind)
-SIM_FIND(CoinFBX RELEASELIBNAMES CoinFBX DEBUGLIBNAMES CoinFBXd
-         INCLUDEFILE CoinFBX/SoFBXFileKit.h)
