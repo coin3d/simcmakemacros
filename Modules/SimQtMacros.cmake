@@ -138,6 +138,79 @@ MACRO (SIM_QT4_ADD_RESOURCES_TO outfiles todirectory )
   ENDFOREACH (it)
 ENDMACRO(SIM_QT4_ADD_RESOURCES_TO)
 
+# SIM_CREATE_QT4_START_JOINTRUNNER(runnername)
+# Starts a block of unittests that should be compiled into
+# a single runner. Add tests using SIM_CREATE_QT4_UNITTEST().
+# Note that the unittests to be compiled can't have a main()
+# method when SIM_JOINT_UNITTEST_RUNNER is defined.
+MACRO(SIM_CREATE_QT4_START_JOINTRUNNER runnername)
+  SET(JOINT_UNITTEST_RUNNERNAME ${runnername})
+  SET(JOINT_UNITTEST_ENABLED TRUE)
+  # Clear lists
+  SET(JOINT_UNITTEST_NAMES)
+  SET(JOINT_UNITTEST_HEADERS)
+  SET(JOINT_UNITTEST_SOURCES)
+  SET(JOINT_UNITTEST_LIBRARIES)
+ENDMACRO(SIM_CREATE_QT4_START_JOINTRUNNER)
+
+# SIM_CREATE_QT4_JOINT_TEST
+# Do not use directly. Use SIM_CREATE_QT4_START_JOINTRUNNER(),
+# SIM_QT4_CREATE_UNITTEST() and SIM_CREATE_QT4_END_JOINTRUNNER().
+MACRO(SIM_ADD_QT4_JOINT_TEST name header source)
+  LIST(APPEND JOINT_UNITTEST_NAMES ${name})
+  LIST(APPEND JOINT_UNITTEST_HEADERS ${header})
+  LIST(APPEND JOINT_UNITTEST_SOURCES ${source})
+  LIST(APPEND JOINT_UNITTEST_LIBRARIES ${ARGN})
+ENDMACRO(SIM_ADD_QT4_JOINT_TEST)
+
+# SIM_CREATE_QT4_END_JOINTRUNNER()
+# Compiles a runner for the unittests added since the last call
+# to SIM_CREATE_QT4_START_JOINRUNNER().
+MACRO(SIM_CREATE_QT4_END_JOINTRUNNER)
+  LIST(REMOVE_DUPLICATES JOINT_UNITTEST_NAMES)
+  LIST(REMOVE_DUPLICATES JOINT_UNITTEST_HEADERS)
+  LIST(REMOVE_DUPLICATES JOINT_UNITTEST_SOURCES)
+  LIST(REMOVE_DUPLICATES JOINT_UNITTEST_LIBRARIES)
+  
+  SIM_QT4_AUTO_WRAP_ALL(Mocs SOURCES ${JOINT_UNITTEST_HEADERS} OUTFILENAME "__moc__${JOINT_UNITTEST_RUNNERNAME}.cxx")
+
+  # Generate the runner
+  SET(_runner "${CMAKE_CURRENT_BINARY_DIR}/${JOINT_UNITTEST_RUNNERNAME}.cxx")
+  FILE(REMOVE ${_runner})
+  # #includes
+  FILE(APPEND ${_runner} "#include <QtGui/QApplication>\n")
+  FILE(APPEND ${_runner} "#include <QtTest/QtTest>\n")
+  FILE(APPEND ${_runner} "#include <QtCore/QtGlobal>\n")
+  FOREACH(_header ${JOINT_UNITTEST_HEADERS})
+    FILE(TO_NATIVE_PATH ${_header} _nativeHeaderPath)
+    FILE(APPEND ${_runner} "#include \"${_nativeHeaderPath}\"\n")
+  ENDFOREACH(_header)
+  # The main method
+  FILE(APPEND ${_runner} "int main(int argc, char * args[]) {\n")
+  FILE(APPEND ${_runner} "  QApplication app(argc, args);\n")
+  FILE(APPEND ${_runner} "  int result = 0;\n")
+  FOREACH(_test ${JOINT_UNITTEST_NAMES})
+    FILE(APPEND ${_runner} "  ${_test} ${_test}_instance;\n")
+    FILE(APPEND ${_runner} "  result += QTest::qExec(&${_test}_instance, argc, args);\n")
+  ENDFOREACH(_test)
+  FILE(APPEND ${_runner} "  return result;\n")
+  FILE(APPEND ${_runner} "}\n\n")
+
+  # Compile  
+  ADD_DEFINITIONS(-DSIM_JOINT_UNITTEST_RUNNER) 
+  ADD_EXECUTABLE(${JOINT_UNITTEST_RUNNERNAME} ${_runner} ${Mocs} ${JOINT_UNITTEST_HEADERS} ${JOINT_UNITTEST_SOURCES})
+  ADD_TEST(${JOINT_UNITTEST_RUNNERNAME} ${JOINT_UNITTEST_RUNNERNAME})
+  TARGET_LINK_LIBRARIES(${JOINT_UNITTEST_RUNNERNAME} ${JOINT_UNITTEST_LIBRARIES})  
+
+  # Clear lists
+  SET(JOINT_UNITTEST_NAMES)
+  SET(JOINT_UNITTEST_HEADERS)
+  SET(JOINT_UNITTEST_SOURCES)
+  SET(JOINT_UNITTEST_LIBRARIES)
+  SET(JOINT_UNITTEST_RUNNERNAME)
+  SET(JOINT_UNITTEST_ENABLED)
+ENDMACRO(SIM_CREATE_QT4_END_JOINTRUNNER)
+
 # - Set up a simple unittest, with name header and source
 # SIM_CREATE_QT4_UNITTEST(NAME HEADER SOURCE LIBRARIES...)
 #  NAME - the name of the unittest as it will be registred
@@ -148,6 +221,9 @@ ENDMACRO(SIM_QT4_ADD_RESOURCES_TO)
 # QTEST_MAIN() in the sourcefile, to set up a simple unittest with
 # executable name NAME_t(.exe) and testname NAME.
 MACRO(SIM_CREATE_QT4_UNITTEST name header source)
+  IF(JOINT_UNITTEST_ENABLED)
+    SIM_ADD_QT4_JOINT_TEST(${name} ${header} ${source} ${ARGN})
+  ELSE(JOINT_UNITTEST_ENABLED)
     QT4_WRAP_CPP(unittest_moc_SRCS ${header})
     SET(runner_NAME ${name})
     SET(link_LIBS ${ARGN}) # Empty, if no extra params
@@ -162,6 +238,7 @@ MACRO(SIM_CREATE_QT4_UNITTEST name header source)
     TARGET_LINK_LIBRARIES(${runner_NAME} ${link_LIBS} ${QT_QTTEST_LIBRARY})
     ADD_TEST(${name} ${runner_NAME})
     set(unittest_moc_SRCS)
+  ENDIF(JOINT_UNITTEST_ENABLED)
 ENDMACRO(SIM_CREATE_QT4_UNITTEST)
 
 # - Set up a simple unittest, from a base-name
