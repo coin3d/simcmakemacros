@@ -26,6 +26,72 @@ MACRO(SIM_QT4_AUTO_WRAP_CPP outfiles )
   ENDFOREACH(_current_FILE)
 ENDMACRO(SIM_QT4_AUTO_WRAP_CPP)
 
+# SIM_QT4_WRAP_ALL(outfile SOURCE infiles ... [OUTFILENAME outfilename])
+# Optimized version of SIM_QT4_WRAP_CPP(). This file
+# concats all mocs together before compiling, potentially reducing the
+# compiletime. Note that this macro requires Python.
+MACRO(SIM_QT4_AUTO_WRAP_ALL outfile)
+  SIM_VALIDATE_ARGUMENTS(ValidArguments SIM_QT4_AUTO_WRAP_ALL
+                         "SOURCES"                               # Required
+                         "OUTFILENAME;SOURCES"                   # Allowed
+                         "${ARGV}")
+  IF(Python_FOUND OR PYTHONINTERP_FOUND)
+    SET(${_python} ${Python_EXECUTABLE})
+  ELSE(Python_FOUND OR PYTHONINTERP_FOUND)
+    MESSAGE(FATAL_ERROR "Python required to use SIM_QT4_AUTO_WRAP_ALL(). Use FindPython or FindPythonInterp to locate Python")
+  ENDIF(Python_FOUND OR PYTHONINTERP_FOUND)
+  # Required arguments
+  SIM_FETCH_ARGUMENTS(_sources SOURCES ${ARGV})  
+  # Optional arguments
+  SIM_HAS_ARGUMENT(_hasOutfilename OUTFILENAME ${ARGV})
+  IF(_hasOutfilename)
+    SIM_FETCH_ARGUMENTS(_outfilename OUTFILENAME ${ARGV})
+    SET(_mocFilename "${CMAKE_CURRENT_BINARY_DIR}/${_outfilename}")
+  ELSE(_hasOutfilename)
+    SET(_mocFilename "${CMAKE_CURRENT_BINARY_DIR}/__moc_joined.cxx")
+  ENDIF(_hasOutfilename)
+  SET(${outfile} ${_mocFilename})
+    
+  SET(_moccedFiles )
+  FOREACH(_current_FILE ${_sources})
+    # Read file
+    GET_FILENAME_COMPONENT(_abs_FILE ${_current_FILE} ABSOLUTE)
+    FILE(READ ${_abs_FILE} _contents)
+    # Process file
+    STRING(REGEX MATCHALL "Q_OBJECT" _match "${_contents}")
+    IF(_match)
+      QT4_WRAP_CPP(_moccedFiles ${_current_FILE})
+    ENDIF(_match)
+  ENDFOREACH(_current_FILE)
+
+  # Add a target that depends on all mocced files
+  # The command concats all mocced files into a big file
+  LIST(LENGTH _moccedFiles _moccedFilesLen)
+  IF(_moccedFilesLen GREATER 0)
+    FILE(TO_NATIVE_PATH ${_mocFilename} _nativeMocFilename)
+    FILE(RELATIVE_PATH _relMoccedFilename ${CMAKE_CURRENT_BINARY_DIR} ${_mocFilename})
+    SET(_scriptFilename "${_mocFilename}.py")
+    
+    # Generate Python script
+    FILE(REMOVE ${_scriptFilename})
+    FILE(APPEND ${_scriptFilename} "out = file('${_mocFilename}','w')\n")
+    FOREACH(_fileToMoc ${_moccedFiles})
+      FILE(TO_NATIVE_PATH "${_fileToMoc}" _filePath)
+      FILE(APPEND ${_scriptFilename} "out.writelines(file('${_fileToMoc}', 'r').readlines())\n")
+    ENDFOREACH(_fileToMoc)
+    
+    # Target that uses the script
+    ADD_CUSTOM_COMMAND(OUTPUT ${_mocFilename}
+                       DEPENDS ${_moccedFiles}
+                       COMMAND ${_python} ARGS ${_scriptFilename}
+                       COMMENT "Joining ${_moccedFilesLen} mocs to ${_relMoccedFilename}"
+                       VERBATIM)
+  ELSE(_moccedFilesLen GREATER 0)
+    SET(${outfile})
+  ENDIF(_moccedFilesLen GREATER 0)
+ENDMACRO(SIM_QT4_AUTO_WRAP_ALL)
+
+
 
 # SIM_QT4_WRAP_UI_TO(outfiles todirectory inputfiles ... )
 MACRO (SIM_QT4_WRAP_UI_TO outfiles todirectory )
