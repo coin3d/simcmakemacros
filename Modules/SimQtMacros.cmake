@@ -36,7 +36,7 @@ MACRO(SIM_QT4_AUTO_WRAP_ALL outfile)
                          "OUTFILENAME;SOURCES"                   # Allowed
                          "${ARGV}")
   IF(Python_FOUND OR PYTHONINTERP_FOUND)
-    SET(${_python} ${Python_EXECUTABLE})
+    SET(_python ${Python_EXECUTABLE})
   ELSE(Python_FOUND OR PYTHONINTERP_FOUND)
     MESSAGE(FATAL_ERROR "Python required to use SIM_QT4_AUTO_WRAP_ALL(). Use FindPython or FindPythonInterp to locate Python")
   ENDIF(Python_FOUND OR PYTHONINTERP_FOUND)
