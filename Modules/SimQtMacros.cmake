@@ -181,17 +181,19 @@ MACRO(SIM_CREATE_QT4_END_JOINTRUNNER)
     FILE(APPEND ${_runner} "#include <QtGui/QApplication>\n")
     FILE(APPEND ${_runner} "#include <QtTest/QtTest>\n")
     FILE(APPEND ${_runner} "#include <QtCore/QtGlobal>\n")
+    FILE(APPEND ${_runner} "#include <QtCore/QString>\n")
     FOREACH(_header ${JOINT_UNITTEST_HEADERS})
       FILE(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${_header}" _nativeHeaderPath)
       FILE(APPEND ${_runner} "#include \"${_nativeHeaderPath}\"\n")
     ENDFOREACH(_header)
-    # The main method
+    # The main method.
     FILE(APPEND ${_runner} "int main(int argc, char * args[]) {\n")
     FILE(APPEND ${_runner} "  QApplication app(argc, args);\n")
     FILE(APPEND ${_runner} "  int result = 0;\n")
     FOREACH(_test ${JOINT_UNITTEST_NAMES})
       FILE(APPEND ${_runner} "  ${_test} ${_test}_instance;\n")
-      FILE(APPEND ${_runner} "  result += QTest::qExec(&${_test}_instance, argc, args);\n")
+      FILE(APPEND ${_runner} "  if(argc == 1 || QString(args[1]) == \"${_test}\")"
+                             "    result += QTest::qExec(&${_test}_instance);\n")
     ENDFOREACH(_test)
     FILE(APPEND ${_runner} "  return result;\n")
     FILE(APPEND ${_runner} "}\n\n")
@@ -200,8 +202,13 @@ MACRO(SIM_CREATE_QT4_END_JOINTRUNNER)
     SIM_QT4_AUTO_WRAP_ALL(Mocs SOURCES ${JOINT_UNITTEST_HEADERS} OUTFILENAME "__moc__${JOINT_UNITTEST_RUNNERNAME}.cxx")
     ADD_DEFINITIONS(-DSIM_JOINT_UNITTEST_RUNNER) 
     ADD_EXECUTABLE(${JOINT_UNITTEST_RUNNERNAME} ${_runner} ${Mocs} ${JOINT_UNITTEST_HEADERS} ${JOINT_UNITTEST_SOURCES})
-    ADD_TEST(${JOINT_UNITTEST_RUNNERNAME} ${JOINT_UNITTEST_RUNNERNAME})
     TARGET_LINK_LIBRARIES(${JOINT_UNITTEST_RUNNERNAME} ${JOINT_UNITTEST_LIBRARIES})  
+
+    # Add testrunners
+    FOREACH(_test ${JOINT_UNITTEST_NAMES})
+      ADD_TEST(${_test} ${JOINT_UNITTEST_RUNNERNAME} ${_test})
+    ENDFOREACH(_test)
+
   ENDIF(${_count} GREATER 0)
 
   # Clear lists
