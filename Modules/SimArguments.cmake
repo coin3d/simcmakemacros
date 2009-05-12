@@ -151,6 +151,8 @@ MACRO(SIM_VALIDATE_ARGUMENTS success method required allowed args)
       # Check if argument matches the allowed entry
       IF(allowedarg STREQUAL "${argv}")
         SET(Found TRUE)
+      ELSEIF(allowedarg STREQUAL "*")
+        SET(Found TRUE)
       ENDIF(allowedarg STREQUAL "${argv}")
     ENDFOREACH(allowedarg)
 
