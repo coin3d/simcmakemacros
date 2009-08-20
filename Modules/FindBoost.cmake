@@ -75,6 +75,7 @@
 #  Boost_SUBMINOR_VERSION               subminor version number of boost
 #  Boost_LIB_DIAGNOSTIC_DEFINITIONS     Only set on windows. Can be used with add_definitions
 #                                       to print diagnostic information about the automatic
+
 #                                       linking done on windows.
 
 # For each component you list the following variables are set.
@@ -110,7 +111,7 @@
 
 OPTION(Boost_USE_MULTITHREADED "Use the multithreaded versions of the boost libraries" ON)
 
-SET( _boost_TEST_VERSIONS ${Boost_ADDITIONAL_VERSIONS} "1.36.1" "1.36.0" "1.35.1" "1.35.0" "1.35" "1.34.1" "1.34.0" "1.34" "1.33.1" "1.33.0" "1.33" )
+SET( _boost_TEST_VERSIONS ${Boost_ADDITIONAL_VERSIONS} "1.36.1" "1.36.0" "1.36" "1.35.1" "1.35.0" "1.35" "1.34.1" "1.34.0" "1.34" "1.33.1" "1.33.0" "1.33" )
 
 
 ############################################
@@ -235,7 +236,6 @@ ELSE (_boost_IN_CACHE)
     "C:/Program Files/boost/boost_${Boost_FIND_VERSION_MAJOR}_${Boost_FIND_VERSION_MINOR}_${Boost_FIND_VERSION_PATCH}/lib"
     /sw/local/lib
   )
-
   IF( NOT $ENV{BOOST_ROOT} STREQUAL "" )
     IF( WIN32 )
       SET(_boost_INCLUDE_SEARCH_DIRS $ENV{BOOST_ROOT} ${_boost_INCLUDE_SEARCH_DIRS})
@@ -286,7 +286,6 @@ ELSE (_boost_IN_CACHE)
       ELSEIF(_boost_PATH_SUFFIX MATCHES "[0-9]+\\.[0-9]+")
           STRING(REGEX REPLACE "([0-9]+)\\.([0-9]+)" "\\1_\\2" _boost_PATH_SUFFIX ${_boost_PATH_SUFFIX})
       ENDIF(_boost_PATH_SUFFIX MATCHES "[0-9]+\\.[0-9]+\\.[0-9]+")
-
 
       FIND_PATH(Boost_INCLUDE_DIR
           NAMES         boost/config.hpp
