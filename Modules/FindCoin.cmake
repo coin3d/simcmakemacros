@@ -16,7 +16,7 @@ IF(USE_SIM_FIND)
   # FIXME: Experimental find mechanism. Should be tested on several platforms with several
   # configurations and someone extended before becomming the one and only thing. 20081105 larsm
   INCLUDE(SimFind)
-  SIM_FIND(Coin RELEASELIBNAMES Coin Coin3 Coin3s
+  SIM_FIND(Coin RELEASELIBNAMES Coin Coin4 Coin3s
                   DEBUGLIBNAMES Coind Coin3d
                   INCLUDEFILE Inventor/SbLinear.h)
 ELSE(USE_SIM_FIND)
