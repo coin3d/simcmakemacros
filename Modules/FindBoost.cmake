@@ -386,7 +386,10 @@ ELSE (_boost_IN_CACHE)
         )
         STRING(REGEX REPLACE ".* ([0-9])\\.([0-9])\\.[0-9] .*" "\\1\\2"
                _boost_COMPILER_VERSION ${_boost_COMPILER_VERSION})
-        SET (_boost_COMPILER "-gcc${_boost_COMPILER_VERSION}")
+        
+        MESSAGE("GCC 4.3.2 hack!")
+        SET(_boost_COMPILER_VERSION "43")
+        SET(_boost_COMPILER "-gcc${_boost_COMPILER_VERSION}")
       ENDIF (NOT CMAKE_COMPILER_IS_GNUCC)
     ENDIF (APPLE)
   ENDIF(UNIX)
