@@ -14,7 +14,7 @@ SET(FBXSDK_FOUND FALSE)
 
 IF (FBXSDKDIR)
   FIND_LIBRARY(FBXSDK_LIBRARY 
-               NAMES fbxsdk_md2008 fbxsdk_gcc4_ub
+               NAMES fbxsdk_md2008 fbxsdk_gcc4_ub fbxsdk_gcc4 fbxsdk_gcc4d
                PATHS ${FBXSDKDIR}
                PATH_SUFFIXES lib
                NO_DEFAULT_PATH)
