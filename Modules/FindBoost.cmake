@@ -390,7 +390,6 @@ ELSE (_boost_IN_CACHE)
       ENDIF (NOT CMAKE_COMPILER_IS_GNUCC)
     ENDIF (APPLE)
   ENDIF(UNIX)
-  MESSAGE(STATUS "Compiler = ${_boost_COMPILER}")
 
   SET (_boost_MULTITHREADED "-mt")
 
