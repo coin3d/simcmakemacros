@@ -15,7 +15,7 @@ ELSE(USE_SIM_FIND)
     ENDIF(QUARTERDIR)
   ENDIF(NOT QUARTERDIR)
 
-  SET(Quarter_NAMES Quarter Quarter0 Quarter1)
+  SET(Quarter_NAMES Quarter Quarter0 Quarter1 Quarter1s)
   SET(Quarter_NAMES_DEBUG Quarterd Quarter0d Quarter1d)
 
   IF(WIN32 AND NOT QUARTERDIR)
