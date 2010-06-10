@@ -27,8 +27,8 @@ ELSE(USE_SIM_FIND)
     ENDIF(COINDIR)
   ENDIF(NOT COINDIR)
   
-  SET(COIN_NAMES Coin Coin3 Coin3s)
-  SET(COIN_NAMES_DEBUG Coind Coin3d)
+  SET(COIN_NAMES Coin Coin3 Coin3s Coin4)
+  SET(COIN_NAMES_DEBUG Coind Coin3d Coin4d)
   
   IF(APPLE)
     # Coin installs as a framework named Inventor on MacOS
@@ -54,13 +54,13 @@ ELSE(USE_SIM_FIND)
 
     IF(Coin_LIBRARY_DEBUG AND Coin_LIBRARY_RELEASE)
       IF(CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE)
-	#If the generator supports configuration types then set
-	#optimized and debug libraries, or if the CMAKE_BUILD_TYPE has a value
-	SET(Coin_LIBRARY optimized ${Coin_LIBRARY_RELEASE} debug ${Coin_LIBRARY_DEBUG})
+	      #If the generator supports configuration types then set
+	      #optimized and debug libraries, or if the CMAKE_BUILD_TYPE has a value
+	      SET(Coin_LIBRARY optimized ${Coin_LIBRARY_RELEASE} debug ${Coin_LIBRARY_DEBUG})
       ELSE()
-	#If there are no configuration types and CMAKE_BUILD_TYPE has no value
-	#then just use the release libraries
-	SET(Coin_LIBRARY ${Coin_LIBRARY_RELEASE})
+	      #If there are no configuration types and CMAKE_BUILD_TYPE has no value
+	      #then just use the release libraries
+	      SET(Coin_LIBRARY ${Coin_LIBRARY_RELEASE})
       ENDIF()
       SET(Coin_LIBRARIES optimized ${Coin_LIBRARY_RELEASE} debug ${Coin_LIBRARY_DEBUG})
     ENDIF()
